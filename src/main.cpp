@@ -1,5 +1,9 @@
 #include <Arduino.h>
 
+const int RED_LED = 8;
+const int GREEN_LED = 9;
+const int SERVO_PIN = A4;
+
 const int ENA = 3;
 const int FIRST_RIGHT_WHEEL = 2;
 const int SECOND_RIGHT_WHEEL = 4;
@@ -11,6 +15,9 @@ const int FLAME_SENSOR_RIGHT = A0;
 const int FLAME_SENSOR_CENTER = A1;
 const int FLAME_SENSOR_LEFT = A2;
 
+int position = 0;
+int speed = 160;
+
 void moveForward();
 
 void turnLeft();
@@ -21,7 +28,21 @@ void moveBackward();
 
 void stop();
 
+void servoPulse(int angle);
+
+void moveServo();
+
+void turnOnOffLed();
+
+void turnOffOnLed();
+
 void setup() {
+    Serial.begin(9600); // Initialize serial communication for debugging
+
+    pinMode(RED_LED, OUTPUT);
+    pinMode(GREEN_LED, OUTPUT);
+    pinMode(SERVO_PIN, OUTPUT);
+
     pinMode(ENA, OUTPUT);
     pinMode(FIRST_RIGHT_WHEEL, OUTPUT);
     pinMode(SECOND_RIGHT_WHEEL, OUTPUT);
@@ -32,7 +53,9 @@ void setup() {
     pinMode(FLAME_SENSOR_RIGHT, INPUT);
     pinMode(FLAME_SENSOR_CENTER, INPUT);
     pinMode(FLAME_SENSOR_LEFT, INPUT);
-    Serial.begin(9600); // Initialize serial communication for debugging
+
+    analogWrite(ENA, speed);
+    analogWrite(ENB, speed);
 
     stop();
 }
@@ -46,11 +69,39 @@ void loop() {
     // Move forward if the center sensor detects a flame (value > threshold)
     if (centerScaled > 10 && centerScaled < 80) { // Adjust the threshold as needed
         moveForward();
-    } else {
+        turnOnOffLed();
+    } else if (centerScaled >= 1 && centerScaled <= 10) {
         stop();
+        turnOffOnLed();
     }
 
     delay(100); // Small delay to avoid rapid switching
+}
+
+void servoPulse(int angle) {
+    int pwm = (angle * 11) + 500; // Convert angle to microseconds
+    digitalWrite(SERVO_PIN, HIGH);
+    delayMicroseconds(pwm);
+    digitalWrite(SERVO_PIN, LOW);
+    delay(50); // Refresh cycle of servo
+}
+
+void turnOnOffLed() {
+    digitalWrite(GREEN_LED, HIGH);
+    digitalWrite(RED_LED, LOW);
+}
+
+void turnOffOnLed() {
+    digitalWrite(GREEN_LED, LOW);
+    digitalWrite(RED_LED, HIGH);
+}
+
+void moveServo() {
+    for (int angle = 70; angle < 140; ++angle) {
+        delay(50);
+    }
+
+    delay(500);
 }
 
 void moveForward() {
@@ -59,9 +110,6 @@ void moveForward() {
 
     digitalWrite(FIRST_LEFT_WHEEL, LOW);
     digitalWrite(SECOND_LEFT_WHEEL, HIGH);
-
-    analogWrite(ENA, 255); // Full speed
-    analogWrite(ENB, 255); // Full speed
 }
 
 void turnLeft() {
@@ -70,9 +118,6 @@ void turnLeft() {
 
     digitalWrite(FIRST_LEFT_WHEEL, HIGH);
     digitalWrite(SECOND_LEFT_WHEEL, LOW);
-
-    analogWrite(ENA, 255); // Full speed
-    analogWrite(ENB, 255); // Full speed
 }
 
 void turnRight() {
@@ -81,9 +126,6 @@ void turnRight() {
 
     digitalWrite(FIRST_LEFT_WHEEL, LOW);
     digitalWrite(SECOND_LEFT_WHEEL, HIGH);
-
-    analogWrite(ENA, 255); // Full speed
-    analogWrite(ENB, 255); // Full speed
 }
 
 void moveBackward() {
@@ -92,9 +134,6 @@ void moveBackward() {
 
     digitalWrite(FIRST_LEFT_WHEEL, HIGH);
     digitalWrite(SECOND_LEFT_WHEEL, LOW);
-
-    analogWrite(ENA, 255); // Full speed
-    analogWrite(ENB, 255); // Full speed
 }
 
 void stop() {
