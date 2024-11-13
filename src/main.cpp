@@ -2,7 +2,7 @@
 
 const int RED_LED = 8;
 const int GREEN_LED = 9;
-const int SERVO_PIN = A4;
+const int SERVO_PIN = A3;
 
 const int ENA = 3;
 const int FIRST_RIGHT_WHEEL = 2;
@@ -15,8 +15,9 @@ const int FLAME_SENSOR_RIGHT = A0;
 const int FLAME_SENSOR_CENTER = A1;
 const int FLAME_SENSOR_LEFT = A2;
 
-int position = 0;
-int speed = 160;
+const int WATER_PUMP_PIN = 10;
+
+int speed = 255;
 
 void moveForward();
 
@@ -41,7 +42,7 @@ void setup() {
 
     pinMode(RED_LED, OUTPUT);
     pinMode(GREEN_LED, OUTPUT);
-    pinMode(SERVO_PIN, OUTPUT);
+    pinMode(WATER_PUMP_PIN, OUTPUT);
 
     pinMode(ENA, OUTPUT);
     pinMode(FIRST_RIGHT_WHEEL, OUTPUT);
@@ -70,9 +71,11 @@ void loop() {
     if (centerScaled > 10 && centerScaled < 80) { // Adjust the threshold as needed
         moveForward();
         turnOnOffLed();
+        digitalWrite(WATER_PUMP_PIN, LOW);
     } else if (centerScaled >= 1 && centerScaled <= 10) {
         stop();
         turnOffOnLed();
+        digitalWrite(WATER_PUMP_PIN, HIGH);
     }
 
     delay(100); // Small delay to avoid rapid switching
@@ -105,6 +108,9 @@ void moveServo() {
 }
 
 void moveForward() {
+    analogWrite(ENA, speed); // Set speed
+    analogWrite(ENB, speed); // Set speed
+
     digitalWrite(FIRST_RIGHT_WHEEL, LOW);
     digitalWrite(SECOND_RIGHT_WHEEL, HIGH);
 
@@ -113,6 +119,9 @@ void moveForward() {
 }
 
 void turnLeft() {
+    analogWrite(ENA, speed); // Set speed
+    analogWrite(ENB, speed); // Set speed
+
     digitalWrite(FIRST_RIGHT_WHEEL, LOW);
     digitalWrite(SECOND_RIGHT_WHEEL, HIGH);
 
@@ -121,6 +130,9 @@ void turnLeft() {
 }
 
 void turnRight() {
+    analogWrite(ENA, speed); // Set speed
+    analogWrite(ENB, speed); // Set speed
+
     digitalWrite(FIRST_RIGHT_WHEEL, HIGH);
     digitalWrite(SECOND_RIGHT_WHEEL, LOW);
 
@@ -129,6 +141,9 @@ void turnRight() {
 }
 
 void moveBackward() {
+    analogWrite(ENA, speed); // Set speed
+    analogWrite(ENB, speed); // Set speed
+
     digitalWrite(FIRST_RIGHT_WHEEL, HIGH);
     digitalWrite(SECOND_RIGHT_WHEEL, LOW);
 
