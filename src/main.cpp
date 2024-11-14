@@ -18,6 +18,7 @@ const int FLAME_SENSOR_LEFT = A2;
 const int WATER_PUMP_PIN = 10;
 
 int speed = 255;
+int pumpSpeed = 255;
 
 void moveForward();
 
@@ -71,11 +72,11 @@ void loop() {
     if (centerScaled > 10 && centerScaled < 80) { // Adjust the threshold as needed
         moveForward();
         turnOnOffLed();
-        digitalWrite(WATER_PUMP_PIN, LOW);
+        analogWrite(WATER_PUMP_PIN, 0);
     } else if (centerScaled >= 1 && centerScaled <= 10) {
         stop();
         turnOffOnLed();
-        digitalWrite(WATER_PUMP_PIN, HIGH);
+        analogWrite(WATER_PUMP_PIN, pumpSpeed);
     }
 
     delay(100); // Small delay to avoid rapid switching
